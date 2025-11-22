@@ -283,10 +283,25 @@ function app() {
                 });
 
                 this.currentDownloadId = data.id;
+
+                // Add to active downloads for better visibility
+                this.activeDownloads.push({
+                    id: data.id,
+                    title: this.videoInfo?.title || 'Downloading...',
+                    progress: 0,
+                    speed: '',
+                    eta: ''
+                });
+
                 this.showToast('Download started', 'info');
 
-                // Poll for progress
-                this.pollDownloadProgress();
+                // Clear the form
+                this.videoInfo = null;
+                this.downloadUrl = '';
+                this.downloading = false;
+
+                // Start polling for all active downloads
+                this.pollActiveDownloads();
             } catch (error) {
                 this.showToast(error.message, 'error');
                 this.downloading = false;
