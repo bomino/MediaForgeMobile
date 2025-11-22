@@ -564,42 +564,33 @@
                 </div>
 
                 <div class="space-y-4">
-                    <!-- Server Connection -->
+                    <!-- Connection Status (simple display) -->
                     <div class="glass rounded-xl p-4">
-                        <h2 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
-                            <i data-lucide="server" class="w-4 h-4 text-primary-500"></i>
-                            Server Connection
-                        </h2>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Server URL</label>
-                                <input
-                                    type="url"
-                                    x-model="apiUrl"
-                                    @change="saveLocalSettings()"
-                                    placeholder="http://localhost:5000"
-                                    class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
-                                >
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div :class="connected ? 'bg-emerald-500' : 'bg-red-500'" class="w-3 h-3 rounded-full"></div>
+                                <div>
+                                    <p class="text-sm font-medium text-slate-900 dark:text-white" x-text="connected ? 'Connected to Server' : 'Not Connected'"></p>
+                                    <p class="text-xs text-slate-500" x-text="connected ? 'Ready to download' : 'Check server settings below'"></p>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <div :class="connected ? 'bg-emerald-500' : 'bg-red-500'" class="w-2 h-2 rounded-full"></div>
-                                <span class="text-xs" :class="connected ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'" x-text="connected ? 'Connected' : 'Disconnected'"></span>
-                                <button @click="checkConnection()" class="ml-auto text-xs text-primary-600 dark:text-primary-400">Test Connection</button>
-                            </div>
+                            <button @click="checkConnection()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition">
+                                Refresh
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Download Defaults -->
+                    <!-- Download Settings -->
                     <div class="glass rounded-xl p-4">
                         <h2 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
                             <i data-lucide="download" class="w-4 h-4 text-primary-500"></i>
-                            Download Defaults
+                            Download Settings
                         </h2>
 
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <!-- Default Format -->
                             <div>
-                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Format</label>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">File Format</label>
                                 <select
                                     x-model="serverSettings.default_format"
                                     @change="markSettingsDirty()"
@@ -613,45 +604,31 @@
 
                             <!-- Default Quality -->
                             <div>
-                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Quality</label>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Video Quality</label>
                                 <select
                                     x-model="serverSettings.default_quality"
                                     @change="markSettingsDirty()"
                                     class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
                                 >
                                     <template x-for="q in serverSettings.available_qualities || ['best', '1080p', '720p', '480p']" :key="q">
-                                        <option :value="q" x-text="q === 'best' ? 'Best' : q === 'worst' ? 'Lowest' : q"></option>
+                                        <option :value="q" x-text="q === 'best' ? 'Best Available' : q === 'worst' ? 'Smallest Size' : q"></option>
                                     </template>
                                 </select>
                             </div>
 
-                            <!-- Quality Fallback -->
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">If Unavailable</label>
-                                <select
-                                    x-model="serverSettings.quality_fallback"
-                                    @change="markSettingsDirty()"
-                                    class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
-                                >
-                                    <option value="best_available">Use best available</option>
-                                    <option value="next_lower">Try next lower</option>
-                                    <option value="fail">Fail with error</option>
-                                </select>
-                            </div>
-
-                            <!-- Max Concurrent -->
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Max Concurrent</label>
+                            <!-- Simultaneous Downloads -->
+                            <div class="col-span-2">
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Simultaneous Downloads</label>
                                 <select
                                     x-model="serverSettings.max_concurrent_downloads"
                                     @change="markSettingsDirty()"
                                     class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
                                 >
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
+                                    <option value="1">1 at a time</option>
+                                    <option value="2">2 at a time</option>
+                                    <option value="3">3 at a time</option>
+                                    <option value="4">4 at a time</option>
+                                    <option value="5">5 at a time</option>
                                 </select>
                             </div>
                         </div>
@@ -704,11 +681,11 @@
                         </div>
                     </div>
 
-                    <!-- Interface -->
+                    <!-- Appearance -->
                     <div class="glass rounded-xl p-4">
                         <h2 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
                             <i data-lucide="palette" class="w-4 h-4 text-primary-500"></i>
-                            Interface
+                            Appearance
                         </h2>
 
                         <div class="grid grid-cols-2 gap-3 mb-4">
@@ -728,16 +705,16 @@
 
                             <!-- Auto Clear -->
                             <div>
-                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Auto-clear</label>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Auto-delete History</label>
                                 <select
                                     x-model="serverSettings.auto_clear_completed"
                                     @change="markSettingsDirty()"
                                     class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
                                 >
-                                    <option value="0">Never</option>
+                                    <option value="0">Keep forever</option>
                                     <option value="1">After 1 hour</option>
                                     <option value="6">After 6 hours</option>
-                                    <option value="24">After 24 hours</option>
+                                    <option value="24">After 1 day</option>
                                     <option value="168">After 1 week</option>
                                 </select>
                             </div>
@@ -754,22 +731,60 @@
                         </label>
                     </div>
 
-                    <!-- Advanced -->
-                    <div class="glass rounded-xl p-4">
-                        <h2 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
-                            <i data-lucide="terminal" class="w-4 h-4 text-primary-500"></i>
-                            Advanced
-                        </h2>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Extra yt-dlp Arguments</label>
-                            <input
-                                type="text"
-                                x-model="serverSettings.extra_ytdlp_args"
-                                @input="markSettingsDirty()"
-                                placeholder="e.g., --geo-bypass --cookies-from-browser chrome"
-                                class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none font-mono"
-                            >
-                            <p class="text-xs text-slate-500 mt-1">Additional command-line arguments for yt-dlp</p>
+                    <!-- Advanced (Collapsible) -->
+                    <div class="glass rounded-xl p-4" x-data="{ showAdvanced: false }">
+                        <button
+                            @click="showAdvanced = !showAdvanced"
+                            class="w-full flex items-center justify-between text-sm font-semibold text-slate-900 dark:text-white"
+                        >
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="settings-2" class="w-4 h-4 text-primary-500"></i>
+                                Advanced Settings
+                            </span>
+                            <i :class="showAdvanced ? 'rotate-180' : ''" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+
+                        <div x-show="showAdvanced" x-collapse class="mt-4 space-y-4">
+                            <!-- Server URL -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Server Address</label>
+                                <input
+                                    type="url"
+                                    x-model="apiUrl"
+                                    @change="saveLocalSettings(); checkConnection()"
+                                    placeholder="http://192.168.1.100:5000"
+                                    class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none font-mono"
+                                >
+                                <p class="text-xs text-slate-500 mt-1">URL where MediaForge server is running</p>
+                            </div>
+
+                            <!-- Quality Fallback -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Quality Fallback</label>
+                                <select
+                                    x-model="serverSettings.quality_fallback"
+                                    @change="markSettingsDirty()"
+                                    class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
+                                >
+                                    <option value="best_available">Use best available</option>
+                                    <option value="next_lower">Try next lower quality</option>
+                                    <option value="fail">Show error</option>
+                                </select>
+                                <p class="text-xs text-slate-500 mt-1">What to do when selected quality isn't available</p>
+                            </div>
+
+                            <!-- Extra yt-dlp Arguments -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">Extra Download Options</label>
+                                <input
+                                    type="text"
+                                    x-model="serverSettings.extra_ytdlp_args"
+                                    @input="markSettingsDirty()"
+                                    placeholder="e.g., --geo-bypass"
+                                    class="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-slate-800 border-0 shadow-sm focus:ring-2 focus:ring-primary-500/50 outline-none font-mono"
+                                >
+                                <p class="text-xs text-slate-500 mt-1">For advanced users only</p>
+                            </div>
                         </div>
                     </div>
 
@@ -811,9 +826,12 @@
                             <i data-lucide="info" class="w-4 h-4 text-primary-500"></i>
                             About
                         </h2>
-                        <div class="text-xs text-slate-500 space-y-1">
-                            <p>MediaForge Mobile App v1.0.0</p>
-                            <p>PWA with Capacitor support</p>
+                        <div class="text-xs text-slate-500 space-y-2">
+                            <p class="font-medium text-slate-700 dark:text-slate-300">MediaForge Mobile v1.0.0</p>
+                            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+                                <p>Developed by <a href="https://qidaya.com" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline">Qidaya.com</a></p>
+                                <p class="mt-1">&copy; 2024 Qidaya. All Rights Reserved.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
