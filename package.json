@@ -1,0 +1,38 @@
+{
+  "name": "mediaforge-app",
+  "version": "1.0.0",
+  "description": "MediaForge Mobile App - PWA with Capacitor support",
+  "main": "src/index.html",
+  "scripts": {
+    "dev": "npx serve src -p 3000",
+    "build": "node scripts/build.js",
+    "cap:init": "npx cap init MediaForge com.mediaforge.app --web-dir dist",
+    "cap:add:android": "npx cap add android",
+    "cap:add:ios": "npx cap add ios",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios"
+  },
+  "keywords": [
+    "video",
+    "downloader",
+    "trimmer",
+    "compressor",
+    "pwa",
+    "capacitor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.0"
+  },
+  "optionalDependencies": {
+    "@capacitor/core": "^5.0.0",
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/ios": "^5.0.0",
+    "@capacitor/filesystem": "^5.0.0",
+    "@capacitor/share": "^5.0.0"
+  }
+}

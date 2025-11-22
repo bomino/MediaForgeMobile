@@ -1,0 +1,5 @@
+# Development server
+http-server==1.0.0
+
+# Or use Python's built-in http.server (no dependencies needed)
+# python -m http.server 3000 --directory src
