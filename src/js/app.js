@@ -96,6 +96,9 @@ function app() {
 
         // Initialize
         async init() {
+            // Apply theme immediately from localStorage/system preference
+            this.applyTheme();
+
             // Set up online/offline listeners
             window.addEventListener('online', () => {
                 this.online = true;
@@ -110,6 +113,13 @@ function app() {
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 this.installPrompt = e;
+            });
+
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (this.serverSettings.theme === 'system') {
+                    this.applyTheme();
+                }
             });
 
             // Check server connection
@@ -214,7 +224,7 @@ function app() {
         },
 
         applyTheme() {
-            const theme = this.serverSettings.theme;
+            const theme = this.serverSettings.theme || localStorage.getItem('theme') || 'system';
             if (theme === 'dark') {
                 this.darkMode = true;
             } else if (theme === 'light') {
@@ -224,6 +234,7 @@ function app() {
                 this.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
             }
             localStorage.setItem('darkMode', this.darkMode);
+            localStorage.setItem('theme', theme);
         },
 
         // PWA Install
